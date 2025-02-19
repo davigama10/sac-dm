@@ -7,4 +7,3 @@ class LogSchema(BaseModel):
     vehicle_id: int
     status_id: int
     timestamp: str
-    axis: str

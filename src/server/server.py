@@ -42,7 +42,7 @@ app.add_middleware(
 
 
 @app.get("/")
-def show_devices():
+def default_page():
     return {"SUCCESS"}
 
 

@@ -95,7 +95,6 @@ class Log(Base):
     sacdm_id = Column(Integer, ForeignKey('sac_dm.id'), nullable=True)
     status_id = Column(Integer, ForeignKey('status_description.id'), nullable=True)
     timestamp = Column(String, nullable=True)
-    axis = Column(String, nullable=True)
 
 
 class FaultCounter(Base):
