@@ -76,6 +76,15 @@ def log_verifier(sac_dm_data: List[SACDMSchema], db: Session):
     return is_faulty
 
 
+def get_log(id: int, db: Session):
+    if id:
+        data = db.query(Log).filter(Log.vehicle_id == id).all()
+        if data:
+            return data
+        else:
+            return "No logs with this ID!"
+
+
 def create_log(data: LogSchema, db: Session):
     data_to_insert = Log(**data.dict())
     db.add(data_to_insert)

@@ -25,6 +25,7 @@ from controllers.sac_dm import *
 from controllers.status import create_status, get_all_status
 from controllers.vehicle import *
 from controllers.sacdm_default import *
+from controllers.fault import get_log
 from database import (get_db, Session)
 from controllers.user import create_user, get_all_users, delete_user, get_user_by_username
 
@@ -111,6 +112,7 @@ def new_vehicle(vehicle: VehicleSchema, db: Session=Depends(get_db)):
 def new_status(status: StatusSchema, db: Session=Depends(get_db)):
     return create_status(status, db)
 
+
 # Route to get all data from status table
 @app.get("/status")
 def get_status(db: Session=Depends(get_db)):
@@ -154,6 +156,13 @@ def delete_sacdm_by_datetime(datetime_initial: Optional[str] = Query(None, descr
                     datetime_final: Optional[str] = Query(None, description="Optional final datetime"), 
                     db: Session=Depends(get_db)):
     return delete_sacdm_records_by_datetime(datetime_initial, datetime_final, db)
+
+
+# Route to get log by vehicle_id
+@app.get("/log_by_vehicle_id/{id}")
+def get_log_by_vehicle_id(id: int, db: Session=Depends(get_db)):
+    data: List[Log] = get_log(id, db)
+    return data
 
 
 # Route to get all data from accelerometer table
