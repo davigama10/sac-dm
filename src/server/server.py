@@ -2,7 +2,7 @@ import sqlite3
 import datetime
 import json
 import random
-from models.models import Device, SACDM, AccelerometerAcquisition, LoginRequest, User, Status, Vehicle, SACDMDefault
+from models.models import Device, SACDM, AccelerometerAcquisition, LoginRequest, User, Status, Vehicle, SACDMDefault, Condition
 from models.users import authenticate_user, get_current_user
 from models.token import create_access_token
 from schemas.accelerometer import AccelerometerSchema
@@ -12,6 +12,7 @@ from schemas.status import StatusSchema
 from schemas.user import UserSchema
 from schemas.vehicle import VehicleSchema
 from schemas.sacdm_default import SACDMDefaultSchema
+from schemas.condition import ConditionSchema
 from fastapi import Depends, FastAPI, Query, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -26,6 +27,7 @@ from controllers.status import create_status, get_all_status
 from controllers.vehicle import *
 from controllers.sacdm_default import *
 from controllers.fault import get_log
+from controllers.condition import create_condition, get_all_condition
 from database import (get_db, Session)
 from controllers.user import create_user, get_all_users, delete_user, get_user_by_username
 
@@ -117,6 +119,19 @@ def new_status(status: StatusSchema, db: Session=Depends(get_db)):
 @app.get("/status")
 def get_status(db: Session=Depends(get_db)):
     data: List[Status] = get_all_status(db)
+    return data
+
+
+# Route to insert a new data into the condition table
+@app.post("/condition")
+def new_condition(condition: ConditionSchema, db: Session=Depends(get_db)):
+    return create_condition(condition, db)
+
+
+# Route to get all data from condition table
+@app.get("/condition")
+def get_condition(db: Session=Depends(get_db)):
+    data: List[Condition] = get_all_condition(db)
     return data
 
 

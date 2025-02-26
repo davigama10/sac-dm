@@ -43,33 +43,33 @@ def log_verifier(sac_dm_data: List[SACDMSchema], db: Session):
     # Consulta o último status do dispositivo
     vehicle = db.query(Vehicle).filter(Vehicle.id == sac_dm_data[-1].vehicle_id).order_by(desc(Vehicle.id)).first()
     
-    # Estado atual do dispositivo (assumindo que 3 = normal, 4 = falha)
-    current_status = vehicle.status_id if vehicle.status_id else 3  # Se não houver logs, assume que está normal
+    # Estado atual do dispositivo (assumindo que 1 = normal, not 1 = falha)
+    current_condition = vehicle.condition_id if vehicle.condition_id else 1  # Se não houver logs, assume que está normal
 
     is_faulty = classification(*formated_data,  5, ["NF"])
 
-    if is_faulty == "inconclusivo" and current_status == 3:  # Se estava normal e agora está em falha
+    if is_faulty == "inconclusivo" and current_condition == 1:  # Se estava normal e agora está em falha
         new_log = Log(
             vehicle_id = sac_dm_data[-1].vehicle_id,
             device_id = sac_dm_data[-1].device_id,
             sacdm_id = db.query(SACDM.id).order_by(desc(SACDM.id)).first()[0],
-            status_id = 4,  # 4 = falha
+            condition_id = 2,  # 2 = alguma falha
             timestamp = sac_dm_data[-1].timestamp
         )
         vehicle_aux = db.query(Vehicle).filter(Vehicle.id == sac_dm_data[-1].vehicle_id).order_by(desc(Vehicle.id)).first()
-        vehicle_aux.status_id = 4
+        vehicle_aux.condition_id = 2
         db.add(new_log)
         db.commit()
-    elif is_faulty == "NF" and current_status == 4:  # Se estava em falha e agora está normal
+    elif is_faulty == "NF" and current_condition != 1:  # Se estava em falha e agora está normal
         new_log = Log(
             vehicle_id = sac_dm_data[-1].vehicle_id,
             device_id = sac_dm_data[-1].device_id,
             sacdm_id = db.query(SACDM.id).order_by(desc(SACDM.id)).first()[0],
-            status_id = 3,  # 3 = normal
+            condition_id = 1,  # 1 = normal
             timestamp = sac_dm_data[-1].timestamp
         )
         vehicle_aux = db.query(Vehicle).filter(Vehicle.id == sac_dm_data[-1].vehicle_id).order_by(desc(Vehicle.id)).first()
-        vehicle_aux.status_id = 3
+        vehicle_aux.condition_id = 1
         db.add(new_log)
         db.commit()
 
